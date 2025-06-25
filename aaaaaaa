@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Avançado de Validação de Peituda™</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Comic+Neue:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(45deg, #ff69b4, #ff1493, #c71585, #8b008b);
+            background-size: 400% 400%;
+            animation: gradientShift 4s ease infinite;
+            font-family: 'Orbitron', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            color: #fff;
+            font-size: 20px;
+            animation: twinkle 2s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .nasa-header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #fff, 0 0 30px #ff69b4, 0 0 40px #ff69b4; }
+            to { text-shadow: 0 0 30px #fff, 0 0 40px #ff69b4, 0 0 50px #ff69b4; }
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.2rem;
+            color: #ffb6c1;
+            margin-top: 10px;
+        }
+        
+        .validation-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 105, 180, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .validation-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .question {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .kitty-emoji {
+            font-size: 3rem;
+            animation: bounce 1s infinite;
+            margin: 0 10px;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 30px;
+            position: relative;
+            z-index: 10;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-sim {
+            background: linear-gradient(45deg, #00ff00, #32cd32);
+            color: #000;
+            box-shadow: 0 10px 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        .btn-sim:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(0, 255, 0, 0.5);
+        }
+        
+        .btn-nao {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(255, 0, 0, 0.3);
+            transition: all 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .btn-nao:hover,
+        .btn-nao:active,
+        .btn-nao:focus {
+            animation: runAway 0.5s ease-out forwards;
+        }
+        
+        @keyframes runAway {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(50px, -30px) rotate(15deg); }
+            50% { transform: translate(-80px, 40px) rotate(-20deg); }
+            75% { transform: translate(100px, -60px) rotate(25deg); }
+            100% { transform: translate(-120px, 80px) rotate(-30deg) scale(0.8); }
+        }
+        
+        .loading-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading-text {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .loading-bar {
+            width: 400px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            max-width: 90vw;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(45deg, #ff69b4, #00ff00);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .success-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #00ff00, #32cd32, #00ff00);
+            z-index: 1000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: successGlow 2s ease infinite alternate;
+        }
+        
+        @keyframes successGlow {
+            from { background: linear-gradient(45deg, #00ff00, #32cd32, #00ff00); }
+            to { background: linear-gradient(45deg, #32cd32, #00ff00, #32cd32); }
+        }
+        
+        .success-text {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #000;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .certificate {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            border: 5px solid #ff69b4;
+            text-align: center;
+            color: #000;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin: 0 20px;
+        }
+        
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+        
+        @keyframes explode {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(20);
+                opacity: 0;
+            }
+        }
+        
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            animation: scan 3s infinite;
+        }
+        
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .question {
+                font-size: 1.5rem;
+            }
+            
+            .buttons-container {
+                gap: 20px;
+            }
+            
+            .btn {
+                font-size: 1rem;
+                padding: 12px 24px;
+            }
+            
+            .success-text {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <div class="nasa-header">
+            <div class="logo">N.A.S.A. PEITUDA SYSTEM</div>
+            <div class="subtitle">🌸 Powered by Hello Kitty Technology™ 🌸</div>
+        </div>
+        
+        <div class="validation-panel">
+            <div class="scan-line"></div>
+            <div class="question">
+                <span class="kitty-emoji">🐱</span>
+                VOCÊ É PEITUDA?
+                <span class="kitty-emoji">💖</span>
+            </div>
+            
+            <div class="buttons-container">
+                <button class="btn btn-sim" type="button" onclick="confirmarPeituda()">
+                    ✨ SIM ✨
+                </button>
+                <button class="btn btn-nao" type="button" id="btnNao" onmouseover="fugirBotao()" onclick="tentarNao()">
+                    ❌ NÃO
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">
+            <div>🔬 ANALISANDO DADOS CIENTÍFICOS...</div>
+            <div>🛰️ CONSULTANDO SATÉLITES DA NASA...</div>
+            <div>🐱 VALIDANDO COM HELLO KITTY...</div>
+        </div>
+        <div class="loading-bar">
+            <div class="loading-progress" id="loadingProgress"></div>
+        </div>
+        <div id="loadingMessages"></div>
+    </div>
+    
+    <div class="success-screen" id="successScreen">
+        <div class="fireworks" id="fireworks"></div>
+        <div class="success-text">🎉 CONFIRMADO! 🎉</div>
+        
+        <div class="certificate">
+            <h2 style="color: #ff69b4; margin-bottom: 20px;">📜 CERTIFICADO OFICIAL 📜</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 15px;">
+                <strong>A NASA e a Hello Kitty certificam que:</strong>
+            </p>
+            <p style="font-size: 1.5rem; color: #ff1493; font-weight: bold; margin-bottom: 15px;">
+                VOCÊ É OFICIALMENTE PEITUDA! 🍒
+            </p>
+            <p style="margin-bottom: 10px;">
+                ✅ Validado por 127 satélites<br>
+                ✅ Aprovado pela Hello Kitty<br>
+                ✅ Confirmado por 99.9% dos cientistas
+            </p>
+            <p style="font-size: 0.8rem; color: #666;">
+                Certificado válido em todo o universo • Não aceite imitações
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starSymbols = ['⭐', '✨', '💫', '🌟'];
+            
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.textContent = starSymbols[Math.floor(Math.random() * starSymbols.length)];
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        let tentativasNao = 0;
+        const mensagensFuga = [
+            "🏃‍♀️ Não tão rápido!",
+            "🚀 Houston, temos um problema!",
+            "🐱 A Hello Kitty discorda!",
+            "🔬 Dados científicos dizem que não!",
+            "💖 Seu coração sabe a verdade!",
+            "🌸 Aceite sua fabulosidade!"
+        ];
+        
+        function fugirBotao() {
+            const btnNao = document.getElementById('btnNao');
+            const randomX = (Math.random() - 0.5) * window.innerWidth * 0.3;
+            const randomY = (Math.random() - 0.5) * window.innerHeight * 0.3;
+            
+            btnNao.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${Math.random() * 360}deg)`;
+            
+            if (tentativasNao < mensagensFuga.length) {
+                btnNao.textContent = mensagensFuga[tentativasNao];
+                tentativasNao++;
+            }
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(100);
+            }
+            
+            setTimeout(() => {
+                btnNao.style.transform = 'translate(0, 0) rotate(0deg)';
+                if (tentativasNao >= mensagensFuga.length) {
+                    btnNao.textContent = '❌ IMPOSSÍVEL';
+                    btnNao.style.opacity = '0.5';
+                }
+            }, 2000);
+        }
+        
+        function tentarNao() {
+            alert('🚫 ERROR 404: Opção "NÃO" não encontrada no sistema! 🚫\n\n🔬 Nossos cientistas determinaram que esta opção é cientificamente impossível!');
+        }
+        
+        function confirmarPeituda() {
+            document.getElementById('loadingScreen').style.display = 'flex';
+            
+            const messages = [
+                "🛰️ Conectando com satélites...",
+                "🔬 Analisando dados biométricos...",
+                "🐱 Consultando banco de dados da Hello Kitty...",
+                "💖 Processando fabulosidade...",
+                "✨ Validando com unicórnios...",
+                "🌈 Confirmando com o arco-íris...",
+                "🎀 Aprovação final da NASA..."
+            ];
+            
+            let progress = 0;
+            let messageIndex = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('loadingProgress').style.width = progress + '%';
+                
+                if (messageIndex < messages.length) {
+                    document.getElementById('loadingMessages').innerHTML = 
+                        `<div style="color: #00ff00; font-size: 1.2rem; margin-top: 20px;">${messages[messageIndex]}</div>`;
+                    messageIndex++;
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        document.getElementById('successScreen').style.display = 'flex';
+                        createFireworks();
+                    }, 1000);
+                }
+            }, 800);
+        }
+        
+        function createFireworks() {
+            const fireworksContainer = document.getElementById('fireworks');
+            const colors = ['#ff69b4', '#00ff00', '#ffff00', '#ff0000', '#00ffff', '#ff8c00'];
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    firework.style.left = Math.random() * 100 + '%';
+                    firework.style.top = Math.random() * 100 + '%';
+                    fireworksContainer.appendChild(firework);
+                    
+                    setTimeout(() => {
+                        firework.remove();
+                    }, 1000);
+                }, i * 200);
+            }
+        }
+        
+        // Inicializar
+        createStars();
+        
+        // Eventos para mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnNao = document.getElementById('btnNao');
+            btnNao.addEventListener('touchstart', fugirBotao);
+            btnNao.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                tentarNao();
+            });
+        });
+        
+        // Easter egg: Konami code
+        let konamiCode = [];
+        const konamiSequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.keyCode);
+            if (konamiCode.length > konamiSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (konamiCode.toString() === konamiSequence.toString()) {
+                alert('🎮 CHEAT CODE ATIVADO! 🎮\n\n🚀 Você desbloqueou o modo ULTRA PEITUDA! 🚀');
+                document.body.style.animation = 'rainbow 0.5s infinite';
+            }
+        });
+    </script>
+</body>
+</html>
